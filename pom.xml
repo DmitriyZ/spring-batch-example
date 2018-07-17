@@ -58,6 +58,12 @@
             <artifactId>spring-batch-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.github.gavlyukovskiy</groupId>-->
+            <!--<artifactId>p6spy-spring-boot-starter</artifactId>-->
+            <!--<version>LATEST</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>

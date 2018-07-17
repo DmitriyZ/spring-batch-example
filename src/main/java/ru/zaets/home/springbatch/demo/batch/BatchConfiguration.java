@@ -10,13 +10,18 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import ru.zaets.home.springbatch.demo.entity.Result;
 import ru.zaets.home.springbatch.demo.services.Status;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +34,11 @@ import static ru.zaets.home.springbatch.demo.services.BatchStarter.BIND_KEY;
 @Slf4j
 @Configuration
 public class BatchConfiguration {
+
+
+    @Autowired
+    public DataSource dataSource;
+
     @Autowired
     public NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -59,7 +69,7 @@ public class BatchConfiguration {
         return jobBuilderFactory.get("main_job")
                 .incrementer(new RunIdIncrementer())
                 .start(
-                        stepBuilderFactory.get("test").tasklet((contribution, chunkContext) -> {
+                        stepBuilderFactory.get("calculate_step").tasklet((contribution, chunkContext) -> {
 
                             final StepContext stepContext = chunkContext.getStepContext();
                             final Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
@@ -84,13 +94,12 @@ public class BatchConfiguration {
 
                             Map<String, Object> p = new HashMap<>();
                             p.put("jobId", id);
-                            int update = jdbcTemplate.update("INSERT INTO result (id, value) " +
+                            int calculated = jdbcTemplate.update("INSERT INTO result (id, value) " +
                                     "SELECT  n.id, n.value " +
                                     "FROM    numbers as n " +
                                     "WHERE  n.status = 1 and MOD (n.value, 2) = 1;", p);
 
-                            log.info("" + update);
-
+                            log.info("Step [{}] job bind key id [{}]. Calculated {} rows", stepContext.getStepName(), id, calculated);
 
                             final Map<String, Object> processedParams = new HashMap<>();
                             processedParams.put("newStatus", Status.PROCESSED.ordinal());
@@ -107,11 +116,52 @@ public class BatchConfiguration {
                                 .listener(jobExecutionListener())
                                 .build()
                 ).on("NOOP").end()
-                .next(stepBuilderFactory.get("dumb").tasklet((contribution, chunkContext) -> {
-                    return RepeatStatus.FINISHED;
-                }).build())
+                .next(sender())
                 .end()
                 .build();
+    }
+
+    @Bean
+    public Step sender() {
+        return this.stepBuilderFactory.get("sendStep")
+                .<Result, Result>chunk(3)
+                .reader(itemReader())
+                .processor(processor())
+//                .writer(itemWriter())
+                .build();
+    }
+
+    @Bean
+    public JdbcCursorItemReader<Result> itemReader() {
+        return new JdbcCursorItemReaderBuilder<Result>()
+                .dataSource(dataSource)
+                .name("resultReader")
+                .sql("select id, value from result")
+                .rowMapper((resultSet, i) -> {
+                    final Result result = new Result();
+                    result.setId(resultSet.getString(1));
+                    result.setValue(resultSet.getLong(2));
+                    return result;
+                })
+                .build();
+
+    }
+
+//    @Bean
+//    public JdbcBatchItemWriter<Result> itemWriter() {
+//        return new JdbcBatchItemWriterBuilder<Result>()
+//                .dataSource(dataSource)
+//                .sql("")
+//                .build();
+//
+//    }
+
+    @Bean
+    public ItemProcessor<Result, Result> processor() {
+        return result -> {
+            System.out.println(result);
+            return result;
+        };
     }
 
 
