@@ -24,6 +24,12 @@ Run PostgreSQL docker container:
 ###Стратегии пакетной обработки
 
 
+### Асинхронный запуск Job
+Для асинхронного запуска джобы необходимо создать специальный Executor service и передать его в Job Launcher:
+
+    jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+
+
 ###Транзакции
 Транзакционность обеспечивается только для шагов (tasklet)
 
@@ -31,6 +37,16 @@ Run PostgreSQL docker container:
 ##### allow-start-if-complete
 Эта настройка для шага позволяет перезапускать его. На основе этой настройки можно сделать мониторинг состояния.
 
+
+### Scaling
+When your Job needs to have the ability to scale out, Spring Batch makes it easy and, out of the box, provides two modes of parallel processing: Single Process (multi-threaded), and Multi-Process.
+
+|PROCESSING METHOD	|PROCESSING TYPE|
+|:------------------|--------------:|
+|Multi-Threaded Step	|Single process|
+|Parallel Steps	|Single process|
+|Step Remote Chunking	|Multi process|
+|Step Partitioning	|Multi process|
 
 Выполнение задач:
 1. Последовательно
