@@ -1,4 +1,4 @@
-package ru.zaets.home.springbatch.demo.entity;
+package ru.zaets.home.springbatch.demo.test.entity;
 
 import lombok.Data;
 

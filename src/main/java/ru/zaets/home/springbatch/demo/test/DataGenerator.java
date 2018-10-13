@@ -1,4 +1,4 @@
-package ru.zaets.home.springbatch.demo.services;
+package ru.zaets.home.springbatch.demo.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * spring-batch-example
  */
 @Slf4j
-@Component
-public class SequenceGenerator {
+//@Component
+public class DataGenerator {
 
 
     @Autowired

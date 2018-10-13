@@ -1,4 +1,4 @@
-package ru.zaets.home.springbatch.demo.batch;
+package ru.zaets.home.springbatch.demo.test;
 
 import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import ru.zaets.home.springbatch.demo.entity.Result;
-import ru.zaets.home.springbatch.demo.services.Status;
+import ru.zaets.home.springbatch.demo.test.entity.Result;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ru.zaets.home.springbatch.demo.services.BatchStarter.BIND_KEY;
+import static ru.zaets.home.springbatch.demo.test.BatchStarter.BIND_KEY;
 
 /**
  * Created by dzaets on 15.07.2018.
@@ -33,7 +32,7 @@ import static ru.zaets.home.springbatch.demo.services.BatchStarter.BIND_KEY;
  */
 @Slf4j
 @Configuration
-public class BatchConfiguration {
+public class TestBatchConfiguration {
 
 
     @Autowired
@@ -126,7 +125,7 @@ public class BatchConfiguration {
         return this.stepBuilderFactory.get("sendStep")
                 .<Result, Result>chunk(3)
                 .reader(itemReader())
-                .processor(processor())
+                .processor(resultProcessor())
 //                .writer(itemWriter())
                 .build();
     }
@@ -148,16 +147,16 @@ public class BatchConfiguration {
     }
 
 //    @Bean
-//    public JdbcBatchItemWriter<Result> itemWriter() {
+//    public ItemWriter<Result> itemWriter() {
 //        return new JdbcBatchItemWriterBuilder<Result>()
 //                .dataSource(dataSource)
-//                .sql("")
+//                .sql("select * from table")
 //                .build();
 //
 //    }
 
     @Bean
-    public ItemProcessor<Result, Result> processor() {
+    public ItemProcessor<Result, Result> resultProcessor() {
         return result -> {
             System.out.println(result);
             return result;

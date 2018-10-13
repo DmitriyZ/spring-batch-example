@@ -1,4 +1,4 @@
-drop table if exists numbers, result;
+drop table if exists numbers, result, onetableprocessing;
 
 create table numbers
 (
@@ -20,3 +20,10 @@ create table result
 
 -- insert into rule values (2);
 -- insert into rule values (5);
+
+
+create table onetableprocessing
+(
+  id serial primary key,
+  processed boolean default false
+);

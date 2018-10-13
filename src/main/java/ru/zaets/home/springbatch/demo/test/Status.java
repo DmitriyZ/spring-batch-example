@@ -1,4 +1,4 @@
-package ru.zaets.home.springbatch.demo.services;
+package ru.zaets.home.springbatch.demo.test;
 
 /**
  * Created by dzaets on 15.07.2018.
