@@ -30,9 +30,9 @@ public class ChunkBatchStarter {
     private final Job mainJob;
 
 
-    public ChunkBatchStarter(JobLauncher chunkJobLauncher, Job chunkJob) {
+    public ChunkBatchStarter(JobLauncher chunkJobLauncher, Job job) {
         this.jobLauncher = chunkJobLauncher;
-        this.mainJob = chunkJob;
+        this.mainJob = job;
     }
 
 

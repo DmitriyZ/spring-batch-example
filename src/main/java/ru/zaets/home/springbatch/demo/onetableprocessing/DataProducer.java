@@ -25,7 +25,7 @@ public class DataProducer {
 
     private void data() throws SQLException {
         String sql = "INSERT INTO onetableprocessing (processed) VALUES (?)";
-        final int batchSize = 50;
+        final int batchSize = 17;
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
